@@ -23,26 +23,27 @@ function http_reject_menu() {
 }
 
 /**
- * Implementation of hook_boot()
+ * Implementation of hook_init()
  *
  * Look at the request and see if it needs to be rejected.
+ * This should be in hook_boot, but that is not being invoked on
+ * my test system. Tsk, tsk.
  *
  * @todo: Preg regexes for user agents.
  */
-function http_request_boot() {
+function http_reject_init() {
   // Load settings.
   $settings = variable_get('http_reject', http_reject_defaults());
 
   // Make an array of allowed types and make sure to merge in
   // the types that MUST ALWAYS be allowed.
-  $allowed_methods = explode("\n", $settings['methods']['allowed']);
-  $allowed_methods = array_merge($allowed_methods, array('GET', 'POST', 'HEAD'));
+  $allowed_methods = array_merge($settings['methods']['allowed'], array('GET', 'POST', 'HEAD'));
 
   // Load the HTTP status codes.
   $codes = http_reject_codes();
 
   // If the current request method is not accepted, die.
-  if (!in_array($_SERVER['REQUEST_TYPE'], $allowed_methods)) {
+  if (!in_array($_SERVER['REQUEST_METHOD'], $allowed_methods)) {
     http_reject_die($settings['methods']['code'], $codes[$settings['methods']['code']]);
   }
 }
