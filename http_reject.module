@@ -23,15 +23,13 @@ function http_reject_menu() {
 }
 
 /**
- * Implementation of hook_init()
+ * Implementation of hook_boot()
  *
  * Look at the request and see if it needs to be rejected.
- * This should be in hook_boot, but that is not being invoked on
- * my test system. Tsk, tsk.
  *
  * @todo: Preg regexes for user agents.
  */
-function http_reject_init() {
+function http_reject_boot() {
   // Load settings.
   $settings = variable_get('http_reject', http_reject_defaults());
 
@@ -66,9 +64,9 @@ function http_reject_die($code = 405, $message = 'Method Not Allowed') {
   // would violate RFC2616.
   if ($code == 405) {
     $settings = variable_get('http_reject', http_reject_defaults());
-    header('Allow: ' . implode(' ', $settings['method']['allowed']));
+    header('Allow: ' . implode(' ', $settings['methods']['allowed']));
   }
-  die();
+  exit();
 }
 
 /**
