@@ -10,7 +10,16 @@ function http_reject_perm() {
  * Implementation of hook_menu()
  */
 function http_reject_menu() {
-
+  $items['admin/settings/http_reject'] = array(
+    'title' => t('HTTP Redirect'),
+    'decription' => t('Configure HTTP Redirect settings'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('http_reject_admin_page'),
+    'access arguments' => array('administer http_reject'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'http_reject.admin.inc',
+  );
+  return $items;
 }
 
 /**
