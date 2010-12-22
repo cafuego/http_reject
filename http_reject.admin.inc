@@ -9,7 +9,7 @@ function http_reject_admin_form() {
   $form['http_reject'] = array('#tree' => TRUE);
   $form['http_reject']['methods']['allowed'] = array(
     '#title' => 'Allowed HTTP Methods',
-    '#description' => t('Add HTTP request methods that should be allowed, one per line.<br />The GET, POST and HEAD method will always be allowed, even if you remove them here, as Drupal can not function without them.<br />Other request methods include: PUT, DELETE, CONNECT, OPTIONS, PATCH, PROPFIND, PROPPATCH, MKCOL, COPY, MOVE, LOCK, UNLOCK, TRACE'),
+    '#description' => t('Add HTTP request methods that should be allowed, one per line. The GET, POST and HEAD method will always be allowed, even if you remove them here, as Drupal can not function without them. Other request methods include: PUT, DELETE, CONNECT, OPTIONS, PATCH, PROPFIND, PROPPATCH, MKCOL, COPY, MOVE, LOCK, UNLOCK, TRACE'),
     '#type' => 'textarea',
     '#default_value' => (empty($settings['methods']['allowed'])) ? "GET\nPOST\nHEAD" : $settings['methods']['allowed'],
   );
@@ -17,6 +17,7 @@ function http_reject_admin_form() {
   $form['http_reject']['methods']['code'] = array(
     '#type' => 'radios',
     '#title' => 'Status Code',
+    '#description' => t('Select which HTTP status code should be used to reject access on requests made via a non-permitted method. The default is 405.'),
     '#options' => http_reject_codes(TRUE),
     '#default_value' => (empty($settings['methods']['code'])) ? 405 : $settings['methods']['code'],
   );
