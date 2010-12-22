@@ -58,7 +58,7 @@ function http_reject_boot() {
  *   Message string.
  */
 function http_reject_die($code = 405, $message = 'Method Not Allowed') {
-  header('HTTP/1.1 ' . $code . ' ' . check_plain($message));
+  header('HTTP/1.1 ' . $code . ' ' . $message);
 
   // Status code 405 MUST include a list of allowable methods. Not including this here
   // would violate RFC2616.
