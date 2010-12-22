@@ -1,4 +1,4 @@
 ; $Id$
 name = HTTP Reject
-desription = Generate HTTP headers and reject unsuppored or undesired requests.
+description = Generate HTTP headers and reject unsuppored or undesired requests.
 core = 6.x
