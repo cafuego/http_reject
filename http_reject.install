@@ -1,0 +1,9 @@
+<?php
+// $Id$
+/**
+ * Implementaion of hook_uninstall()
+ */
+function http_reject_uninstall() {
+  // Cleanup settings.
+  db_query("DELETE FROM {variable} WHERE name = 'http_reject'");
+}
