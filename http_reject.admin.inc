@@ -25,7 +25,7 @@ function http_reject_admin_form() {
 
   $form['http_reject']['ua']['reject'] = array(
     '#title' => 'Disallowed User Agents',
-    '#description' => t('Add preg compatible regular expressions, one per line, that match user agent strings you wish to block. Any expressions that match your current user agent will not be accepted. See the <a href="!link">PHP.net preg_match page</a> for details on the syntax. Your current user-agent string is "%ua"', array('!link' => url('http://php.net/manual/en/function.preg-match.php'), '%ua' => $_SERVER['HTTP_USER_AGENT'])),
+    '#description' => t('Add preg compatible regular expressions, one per line, that match user agent strings you wish to block. Any expressions that match your current user agent will not be accepted. See the <a href="!link">preg_match</a> api page on php.net for details on the syntax. Your current user-agent string is "%ua"', array('!link' => url('http://php.net/manual/en/function.preg-match.php'), '%ua' => $_SERVER['HTTP_USER_AGENT'])),
     '#type' => 'textarea',
     '#default_value' => (empty($settings['ua']['reject'])) ? '' : implode("\n", $settings['ua']['reject']),
   );
@@ -66,13 +66,22 @@ function http_reject_admin_form_validate($form, &$form_state) {
 
   // Check the UA pregs.
   $pregs =  explode("\n", $form_state['values']['http_reject']['ua']['reject']);
+
+  $form_state['values']['http_reject']['ua']['reject'] = array();
   foreach ($pregs as $preg) {
+    // Just explode() seems to leave trailing whitespace, so we first trim() the
+    // preg and then add it back into the array that will be saved if it passes
+    // validation.
+    $preg = trim($preg);
+
     if (preg_match($preg, $_SERVER['HTTP_USER_AGENT']) === FALSE) {
-      form_set_error('http_reject][ua][reject', t('The expression @preg is not a valid regular expression.', array('@preg' => $preg)));
+      form_set_error('http_reject][ua][reject', t('The expression "%preg" is not a valid regular expression.', array('%preg' => check_plain($preg))));
     }
     else if (preg_match($preg, $_SERVER['HTTP_USER_AGENT']) == 1) {
-      form_set_error('http_reject][ua][reject', t('The expression @preg matches your current user-agent. Saving it would prevent you from accessing Drupal.', array('@preg' => $preg)));
+      form_set_error('http_reject][ua][reject', t('The expression "%preg" matches your current user-agent. Saving it would prevent you from accessing Drupal.', array('%preg' => check_plain($preg))));
+    }
+    else {
+      $form_state['values']['http_reject']['ua']['reject'][] = $preg;
     }
   }
-  $form_state['values']['http_reject']['ua']['reject'] = $pregs;
 }
