@@ -67,12 +67,18 @@ function http_reject_admin_form_validate($form, &$form_state) {
   // Check the UA pregs.
   $pregs =  explode("\n", $form_state['values']['http_reject']['ua']['reject']);
 
+  // Initialise the array of sanitised pregs.
   $form_state['values']['http_reject']['ua']['reject'] = array();
+
   foreach ($pregs as $preg) {
     // Just explode() seems to leave trailing whitespace, so we first trim() the
     // preg and then add it back into the array that will be saved if it passes
     // validation.
     $preg = trim($preg);
+
+    // Ah-ha! No empty strings, thanks.
+    if ($preg == '')
+      continue;
 
     if (preg_match($preg, $_SERVER['HTTP_USER_AGENT']) === FALSE) {
       form_set_error('http_reject][ua][reject', t('The expression "%preg" is not a valid regular expression.', array('%preg' => check_plain($preg))));
