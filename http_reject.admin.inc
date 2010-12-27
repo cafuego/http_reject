@@ -33,9 +33,9 @@ function http_reject_admin_form() {
   $form['http_reject']['ua']['code'] = array(
     '#type' => 'radios',
     '#title' => 'Status Code',
-    '#description' => t('Select which HTTP status code should be used to reject access on requests made via a listed user-agent. The default is 405.'),
+    '#description' => t('Select which HTTP status code should be used to reject access on requests made via a listed user-agent. The default is 406.'),
     '#options' => http_reject_codes(TRUE),
-    '#default_value' => (empty($settings['ua']['code'])) ? 405 : $settings['ua']['code'],
+    '#default_value' => (empty($settings['ua']['code'])) ? 406 : $settings['ua']['code'],
   );
 
   return system_settings_form($form);

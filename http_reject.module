@@ -1,5 +1,16 @@
 <?php
 // $Id$
+/*
+ * Implementation of hook_help()
+ */
+function http_reject_help($path, $arg) {
+  switch($path) {
+    case 'admin/settings/http_reject':
+      include_once(drupal_get_path('module', 'http_reject') . '/http_reject.help.inc');
+      return http_reject_admin_help();
+  }
+}
+
 /**
  * Implementation of hook_perm()
  */
@@ -12,7 +23,7 @@ function http_reject_perm() {
  */
 function http_reject_menu() {
   $items['admin/settings/http_reject'] = array(
-    'title' => t('HTTP Reject'),
+    'title' => 'HTTP Reject',
     'decription' => t('Configure HTTP Reject settings'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('http_reject_admin_form'),
@@ -84,6 +95,10 @@ function http_reject_defaults() {
       'allowed' => array('GET', 'POST', 'HEAD'),
       'code' => 405,
     ),
+    'ua' => array(
+     'reject' => array(),
+     'code' => 406,
+    ),
   );
 }
 
@@ -92,6 +107,8 @@ function http_reject_defaults() {
  *
  * @param $optionlist
  *   Boolean - return an option list (or a simple array).
+ *
+ * Shamelessly stolen from http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
  */
 function http_reject_codes($optionlist = FALSE) {
   $codes = array(
