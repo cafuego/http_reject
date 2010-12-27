@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id: http_reject.install,v 1.1 2010/12/22 23:27:15 cafuego Exp $
 /**
  * Implementaion of hook_uninstall()
  */
