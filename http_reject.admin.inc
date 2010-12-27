@@ -22,6 +22,21 @@ function http_reject_admin_form() {
     '#default_value' => (empty($settings['methods']['code'])) ? 405 : $settings['methods']['code'],
   );
 
+  $form['http_reject']['ua']['reject'] = array(
+    '#title' => 'Disallowed User Agents',
+    '#description' => t('Add preg compatible regular expressions, one per line, that match user agent strings you wish to block. Any expressions that match your current user agent will not be accepted. See the <a href="!link">PHP.net preg_match page</a> for details on the syntax. Your current user-agent string is "%ua"', array('!link' => url('http://php.net/manual/en/function.preg-match.php'), '%ua' => $_SERVER['HTTP_USER_AGENT'])),
+    '#type' => 'textarea',
+    '#default_value' => (empty($settings['ua']['reject'])) ? '' : implode("\n", $settings['ua']['reject']),
+  );
+
+  $form['http_reject']['ua']['code'] = array(
+    '#type' => 'radios',
+    '#title' => 'Status Code',
+    '#description' => t('Select which HTTP status code should be used to reject access on requests made via a listed user-agent. The default is 405.'),
+    '#options' => http_reject_codes(TRUE),
+    '#default_value' => (empty($settings['ua']['code'])) ? 405 : $settings['ua']['code'],
+  );
+
   return system_settings_form($form);
 }
 
@@ -47,4 +62,16 @@ function http_reject_admin_form_validate($form, &$form_state) {
     $methods = array();
   }
   $form_state['values']['http_reject']['methods']['allowed'] = $methods;
+
+  // Check the UA pregs.
+  $pregs =  explode("\n", $form_state['values']['http_reject']['ua']['reject']);
+  foreach ($pregs as $preg) {
+    if (preg_match($preg, $_SERVER['HTTP_USER_AGENT']) === FALSE) {
+      form_set_error('http_reject][ua][reject', t('The expression @preg is not a valid regular expression.', array('@preg' => $preg)));
+    }
+    else if (preg_match($preg, $_SERVER['HTTP_USER_AGENT']) == 1) {
+      form_set_error('http_reject][ua][reject', t('The expression @preg matches your current user-agent. Saving it would prevent you from accessing Drupal.', array('@preg' => $preg)));
+    }
+  }
+  $form_state['values']['http_reject']['ua']['reject'] = $pregs;
 }
