@@ -61,6 +61,13 @@ function http_reject_boot() {
       http_reject_die($settings['ua']['code'], $codes[$settings['ua']['code']]);
     }
   }
+  
+  // If the current IP address is blacklisted, die.
+  foreach ($settings['ip']['reject'] as $ip) {
+    if ($ip == $_SERVER['REMOTE_ADDR']) {
+      http_reject_die($settings['ip']['code'], $codes[$settings['ip']['code']]);
+    }
+  }
 }
 
 // --------------------------------------------------------------------------
@@ -98,6 +105,10 @@ function http_reject_defaults() {
     'ua' => array(
      'reject' => array(),
      'code' => 406,
+    ),
+    'ip' => array(
+      'reject' => array(),
+      'code' => 403,
     ),
   );
 }

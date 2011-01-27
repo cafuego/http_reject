@@ -37,6 +37,21 @@ function http_reject_admin_form() {
     '#options' => http_reject_codes(TRUE),
     '#default_value' => (empty($settings['ua']['code'])) ? 406 : $settings['ua']['code'],
   );
+  
+  $form['http_reject']['ip']['reject'] = array(
+    '#title' => 'Disallowed IP Addresses',
+    '#description' => t('Add a list of IP addresses, one per line, that you wish to block. Your current IP address is "%ip"', array('%ip' => $_SERVER['REMOTE_ADDR'])),
+    '#type' => 'textarea',
+    '#default_value' => (empty($settings['ip']['reject'])) ? '' : implode("\n", $settings['ip']['reject']),
+  );
+
+  $form['http_reject']['ip']['code'] = array(
+    '#type' => 'radios',
+    '#title' => 'Status Code',
+    '#description' => t('Select which HTTP status code should be used to reject access on requests made from the above IP addresses. The default is 403.'),
+    '#options' => http_reject_codes(TRUE),
+    '#default_value' => (empty($settings['ip']['code'])) ? 403 : $settings['ip']['code'],
+  );
 
   return system_settings_form($form);
 }
@@ -89,5 +104,12 @@ function http_reject_admin_form_validate($form, &$form_state) {
     else {
       $form_state['values']['http_reject']['ua']['reject'][] = $preg;
     }
+  }
+  
+  // List the IP addresses into an array
+  $ips = explode("\n", $form_state['values']['http_reject']['ip']['reject']);
+  $form_state['values']['http_reject']['ip']['reject'] = array();
+  foreach ($ips as $ip) {
+    $form_state['values']['http_reject']['ip']['reject'][] = trim($ip);
   }
 }
