@@ -13,6 +13,7 @@ function http_reject_admin_form() {
     '#description' => t('Add HTTP request methods that should be allowed, one per line. The GET, POST and HEAD method will always be allowed, even if you remove them here, as Drupal can not function without them. Other request methods include: PUT, DELETE, CONNECT, OPTIONS, PATCH, PROPFIND, PROPPATCH, MKCOL, COPY, MOVE, LOCK, UNLOCK, TRACE'),
     '#type' => 'textarea',
     '#default_value' => (empty($settings['methods']['allowed'])) ? "GET\nPOST\nHEAD" : implode("\n", $settings['methods']['allowed']),
+    '#wysiwyg' => FALSE,
   );
 
   $form['http_reject']['methods']['code'] = array(
@@ -28,6 +29,7 @@ function http_reject_admin_form() {
     '#description' => t('Add preg compatible regular expressions, one per line, that match user agent strings you wish to block. Any expressions that match your current user agent will not be accepted. See the <a href="!link">preg_match</a> api page on php.net for details on the syntax. Your current user-agent string is "%ua"', array('!link' => url('http://php.net/manual/en/function.preg-match.php'), '%ua' => $_SERVER['HTTP_USER_AGENT'])),
     '#type' => 'textarea',
     '#default_value' => (empty($settings['ua']['reject'])) ? '' : implode("\n", $settings['ua']['reject']),
+    '#wysiwyg' => FALSE,
   );
 
   $form['http_reject']['ua']['code'] = array(
@@ -43,6 +45,7 @@ function http_reject_admin_form() {
     '#description' => t('Add a list of IP addresses, one per line, that you wish to block. Your current IP address is "%ip"', array('%ip' => $_SERVER['REMOTE_ADDR'])),
     '#type' => 'textarea',
     '#default_value' => (empty($settings['ip']['reject'])) ? '' : implode("\n", $settings['ip']['reject']),
+    '#wysiwyg' => FALSE,
   );
 
   $form['http_reject']['ip']['code'] = array(
