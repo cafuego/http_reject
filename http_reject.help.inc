@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id: http_reject.help.inc,v 1.1 2010/12/27 03:58:46 cafuego Exp $
 /**
  * Helper fucntion for the help hook.
  */

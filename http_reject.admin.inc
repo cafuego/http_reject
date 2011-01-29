@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id: http_reject.admin.inc,v 1.2 2010/12/27 03:58:46 cafuego Exp $
 /**
  * Settings form.
  */
