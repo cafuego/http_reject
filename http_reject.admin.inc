@@ -13,6 +13,7 @@ function http_reject_admin_form() {
     '#description' => t('Add HTTP request methods that should be allowed, one per line. The GET, POST and HEAD method will always be allowed, even if you remove them here, as Drupal can not function without them. Other request methods include: PUT, DELETE, CONNECT, OPTIONS, PATCH, PROPFIND, PROPPATCH, MKCOL, COPY, MOVE, LOCK, UNLOCK, TRACE'),
     '#type' => 'textarea',
     '#default_value' => (empty($settings['methods']['allowed'])) ? "GET\nPOST\nHEAD" : implode("\n", $settings['methods']['allowed']),
+    '#wysiwyg' => FALSE,
   );
 
   $form['http_reject']['methods']['code'] = array(
@@ -28,6 +29,7 @@ function http_reject_admin_form() {
     '#description' => t('Add preg compatible regular expressions, one per line, that match user agent strings you wish to block. Any expressions that match your current user agent will not be accepted. See the <a href="!link">preg_match</a> api page on php.net for details on the syntax. Your current user-agent string is "%ua"', array('!link' => url('http://php.net/manual/en/function.preg-match.php'), '%ua' => $_SERVER['HTTP_USER_AGENT'])),
     '#type' => 'textarea',
     '#default_value' => (empty($settings['ua']['reject'])) ? '' : implode("\n", $settings['ua']['reject']),
+    '#wysiwyg' => FALSE,
   );
 
   $form['http_reject']['ua']['code'] = array(
@@ -36,6 +38,22 @@ function http_reject_admin_form() {
     '#description' => t('Select which HTTP status code should be used to reject access on requests made via a listed user-agent. The default is 406.'),
     '#options' => http_reject_codes(TRUE),
     '#default_value' => (empty($settings['ua']['code'])) ? 406 : $settings['ua']['code'],
+  );
+  
+  $form['http_reject']['ip']['reject'] = array(
+    '#title' => 'Disallowed IP Addresses',
+    '#description' => t('Add a list of IP addresses, one per line, that you wish to block. Your current IP address is "%ip"', array('%ip' => $_SERVER['REMOTE_ADDR'])),
+    '#type' => 'textarea',
+    '#default_value' => (empty($settings['ip']['reject'])) ? '' : implode("\n", $settings['ip']['reject']),
+    '#wysiwyg' => FALSE,
+  );
+
+  $form['http_reject']['ip']['code'] = array(
+    '#type' => 'radios',
+    '#title' => 'Status Code',
+    '#description' => t('Select which HTTP status code should be used to reject access on requests made from the above IP addresses. The default is 403.'),
+    '#options' => http_reject_codes(TRUE),
+    '#default_value' => (empty($settings['ip']['code'])) ? 403 : $settings['ip']['code'],
   );
 
   return system_settings_form($form);
@@ -89,5 +107,12 @@ function http_reject_admin_form_validate($form, &$form_state) {
     else {
       $form_state['values']['http_reject']['ua']['reject'][] = $preg;
     }
+  }
+  
+  // List the IP addresses into an array
+  $ips = explode("\n", $form_state['values']['http_reject']['ip']['reject']);
+  $form_state['values']['http_reject']['ip']['reject'] = array();
+  foreach ($ips as $ip) {
+    $form_state['values']['http_reject']['ip']['reject'][] = trim($ip);
   }
 }

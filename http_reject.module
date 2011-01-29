@@ -51,7 +51,9 @@ function http_reject_boot() {
   $codes = http_reject_codes();
 
   // If the current request method is not accepted, die.
-  if (!in_array($_SERVER['REQUEST_METHOD'], $allowed_methods)) {
+  // As far as I can tell, php-cli (ie, drush scripts) doesn't use a 
+  // "request method" pers, so make sure one exists.
+  if (!in_array($_SERVER['REQUEST_METHOD'], $allowed_methods) && !empty($_SERVER['REQUEST_METHOD'])) {
     http_reject_die($settings['methods']['code'], $codes[$settings['methods']['code']]);
   }
 
@@ -59,6 +61,13 @@ function http_reject_boot() {
   foreach ($settings['ua']['reject'] as $preg) {
     if (preg_match($preg, $_SERVER['HTTP_USER_AGENT'], $foo) == 1) {
       http_reject_die($settings['ua']['code'], $codes[$settings['ua']['code']]);
+    }
+  }
+  
+  // If the current IP address is blacklisted, die.
+  foreach ($settings['ip']['reject'] as $ip) {
+    if ($ip == $_SERVER['REMOTE_ADDR']) {
+      http_reject_die($settings['ip']['code'], $codes[$settings['ip']['code']]);
     }
   }
 }
@@ -98,6 +107,10 @@ function http_reject_defaults() {
     'ua' => array(
      'reject' => array(),
      'code' => 406,
+    ),
+    'ip' => array(
+      'reject' => array(),
+      'code' => 403,
     ),
   );
 }
