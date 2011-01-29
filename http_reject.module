@@ -51,7 +51,9 @@ function http_reject_boot() {
   $codes = http_reject_codes();
 
   // If the current request method is not accepted, die.
-  if (!in_array($_SERVER['REQUEST_METHOD'], $allowed_methods)) {
+  // As far as I can tell, php-cli (ie, drush scripts) doesn't use a 
+  // "request method" persè, so make sure one exists.
+  if (!in_array($_SERVER['REQUEST_METHOD'], $allowed_methods) && !empty($_SERVER['REQUEST_METHOD'])) {
     http_reject_die($settings['methods']['code'], $codes[$settings['methods']['code']]);
   }
 
