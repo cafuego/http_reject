@@ -6,5 +6,11 @@ reject HTTP requests from such things as FrontPage or a WebDAV client
 early on in the bootstrap process, so the site uses fewer resources
 and the logs aren't spammed with useless request entries.
 
-If possible, this should in fact be done in .htaccess or the web server
-configuration files, but not all users have access to those.
+The module has been expanded somewhat, to allow allow users to block
+access to specific user agents, as well as IP addresses and entire
+network ranges.
+
+The module is not able to handle IPv6 addresses at this stage.
+
+If possible, this should in fact all be done in .htaccess or the web
+server configuration files, but not all users have access to those.
