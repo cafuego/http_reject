@@ -162,11 +162,11 @@ function http_reject_codes($optionlist = FALSE) {
 function http_reject_ip($address, $settings, &$ret) {
 
   // Grab the code that should be used if we return TRUE.
-  $ret = $settings['ip']['code'];
+  $ret = $settings['code'];
 
   // Iterate.
   //
-  foreach ($settings['ip']['reject'] as $entry) {
+  foreach ($settings['reject'] as $entry) {
     $network = preg_split("/\//", trim($entry));
 
     // Check if we're dealing with a single address.
@@ -195,7 +195,6 @@ function http_reject_ip_in_network($ip, $net_addr, $net_mask){
   if ($net_mask <= 0) {
     return FALSE;
   }
-dpm($ip . ' : ' . $net_addr . '/' . $net_mask);
   $ip_binary_string = sprintf("%032b",ip2long($ip));
   $net_binary_string = sprintf("%032b",ip2long($net_addr));
   return (substr_compare($ip_binary_string, $net_binary_string, 0, $net_mask) === 0);

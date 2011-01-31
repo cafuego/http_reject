@@ -112,7 +112,21 @@ function http_reject_admin_form_validate($form, &$form_state) {
   // List the IP addresses into an array
   $ips = explode("\n", $form_state['values']['http_reject']['ip']['reject']);
   $form_state['values']['http_reject']['ip']['reject'] = array();
+
+  // Check that the user isn't blocking his or her own IP, that would just lead to crying.
   foreach ($ips as $ip) {
-    $form_state['values']['http_reject']['ip']['reject'][] = trim($ip);
+    $ip = trim($ip);
+
+    // No empty strings.
+    if ($ip == '')
+      continue;
+
+    // Use the actual matcher to do the test.
+    if (http_reject_ip(ip_address(), array('reject' => array($ip), 'code' => 418), $ret) === TRUE) {
+      form_set_error('http_reject][ip][reject', t('The entry "%ip" matches your current IP address. Saving it would prevent you from accessing Drupal.', array('%ip' => check_plain($ip))));
+    }
+    else {
+      $form_state['values']['http_reject']['ip']['reject'][] = $ip;
+    }
   }
 }
