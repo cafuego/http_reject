@@ -42,7 +42,7 @@ function http_reject_admin_form() {
   
   $form['http_reject']['ip']['reject'] = array(
     '#title' => 'Disallowed IP Addresses',
-    '#description' => t('Add a list of IP addresses, one per line, that you wish to block. Your current IP address is "%ip"', array('%ip' => $_SERVER['REMOTE_ADDR'])),
+    '#description' => t('Add a list of IP or network addresses, one per line, that you wish to block. Your current IP address is "%ip"', array('%ip' => ip_address())),
     '#type' => 'textarea',
     '#default_value' => (empty($settings['ip']['reject'])) ? '' : implode("\n", $settings['ip']['reject']),
     '#wysiwyg' => FALSE,
@@ -108,7 +108,7 @@ function http_reject_admin_form_validate($form, &$form_state) {
       $form_state['values']['http_reject']['ua']['reject'][] = $preg;
     }
   }
-  
+
   // List the IP addresses into an array
   $ips = explode("\n", $form_state['values']['http_reject']['ip']['reject']);
   $form_state['values']['http_reject']['ip']['reject'] = array();

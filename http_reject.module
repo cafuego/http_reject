@@ -63,12 +63,10 @@ function http_reject_boot() {
       http_reject_die($settings['ua']['code'], $codes[$settings['ua']['code']]);
     }
   }
-  
+
   // If the current IP address is blacklisted, die.
-  foreach ($settings['ip']['reject'] as $ip) {
-    if ($ip == $_SERVER['REMOTE_ADDR']) {
-      http_reject_die($settings['ip']['code'], $codes[$settings['ip']['code']]);
-    }
+  if (http_reject_ip(ip_address(), $settings['ip'], $code) === TRUE)  {
+    http_reject_die($code, $codes[$code]);
   }
 }
 
@@ -146,3 +144,60 @@ function http_reject_codes($optionlist = FALSE) {
 
   return $codes;
 }
+
+/**
+ * Helper that checks whether an IP address is matched in a list of IP and network addresses.
+ *
+ * @param $address
+ *   String - IP address.
+ * @param $settings
+ *   Array - The configuration settings for the IP match part of this module.
+ * @param &$ret
+ *   Integer - HTTP status code to be returned.
+ *
+ * @return
+ *   Boolean- Return TRUE if a match is found and FALSE if not.
+ */
+
+function http_reject_ip($address, $settings, &$ret) {
+
+  // Grab the code that should be used if we return TRUE.
+  $ret = $settings['ip']['code'];
+
+  // Iterate.
+  //
+  foreach ($settings['ip']['reject'] as $entry) {
+    $network = preg_split("/\//", trim($entry));
+
+    // Check if we're dealing with a single address.
+    //
+    if (count($network) == 1 || empty($network[1])) {
+      if ($address == $network[0]) {
+        return TRUE;
+      }
+    }
+    // Dealing with a network + mask.
+    else {
+      if (http_reject_ip_in_network($address, $network[0], $network[1]) == TRUE) {
+        return TRUE;
+      }
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Check if a given address exists on a network.
+ *
+ * Shamelessly copied from http://php.net/manual/en/function.ip2long.php
+ */
+function http_reject_ip_in_network($ip, $net_addr, $net_mask){
+  if ($net_mask <= 0) {
+    return FALSE;
+  }
+dpm($ip . ' : ' . $net_addr . '/' . $net_mask);
+  $ip_binary_string = sprintf("%032b",ip2long($ip));
+  $net_binary_string = sprintf("%032b",ip2long($net_addr));
+  return (substr_compare($ip_binary_string, $net_binary_string, 0, $net_mask) === 0);
+}
+
